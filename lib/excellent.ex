@@ -1,0 +1,2 @@
+defmodule Excellent do
+end
