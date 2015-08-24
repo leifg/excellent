@@ -9,7 +9,7 @@ defmodule Excellent do
     {:ok, [{_filename, xml_content}] } = :zip.extract filename, [:memory, {:file_filter, fn(file) -> elem(file, 1) == 'xl/workbook.xml' end }]
 
     {xml, _rest} = :xmerl_scan.string(:erlang.binary_to_list(xml_content))
-    :xmerl_xpath.string('/workbook/sheets/sheet/@name', xml) |> Enum.map(fn(x) -> :erlang.list_to_binary(elem(x, 8)) end) |> List.to_tuple
+    :xmerl_xpath.string('/workbook/sheets/sheet/@name', xml) |> Enum.map(fn(x) -> :erlang.list_to_binary(xmlAttribute(x, :value)) end) |> List.to_tuple
   end
 
   def shared_strings_to_tuple shared_strings do
