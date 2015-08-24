@@ -11,4 +11,9 @@ defmodule Excellent do
     {xml, _rest} = :xmerl_scan.string(:erlang.binary_to_list(xml_content))
     :xmerl_xpath.string('/workbook/sheets/sheet/@name', xml) |> Enum.map(fn(x) -> elem(x, 8 ) end)
   end
+
+  def shared_strings_to_tuple shared_strings do
+    {xml, _rest} = :xmerl_scan.string(:erlang.binary_to_list(shared_strings))
+    :xmerl_xpath.string('/sst/si/t/text()', xml) |> Enum.map(fn(si) -> :erlang.list_to_binary(xmlText(si, :value)) end) |> List.to_tuple
+  end
 end
