@@ -5,7 +5,7 @@ defmodule Excellent do
   Record.defrecord :xmlAttribute, Record.extract(:xmlAttribute, from_lib: "xmerl/include/xmerl.hrl")
   Record.defrecord :xmlText, Record.extract(:xmlText, from_lib: "xmerl/include/xmerl.hrl")
 
-  def read filename, num_of_worksheet do
+  def parse filename, num_of_worksheet do
     xml_content = file_content(filename, 'xl/worksheets/sheet#{num_of_worksheet + 1}.xml')
 
     {:ok, res, _} = :xmerl_sax_parser.stream(xml_content, event_fun: &event/3, event_state: %{shared_strings: shared_strings(filename), lookup: false, content: []})

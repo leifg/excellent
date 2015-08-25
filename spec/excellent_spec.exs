@@ -1,7 +1,7 @@
 defmodule ExcellentSpec do
   use ESpec
 
-  describe "#read" do
+  describe "#parse" do
     context "text only" do
       let :expected_output do
         [
@@ -14,7 +14,7 @@ defmodule ExcellentSpec do
       end
 
       it "returns contents as stream" do
-        expect(Excellent.read('./spec/fixtures/test_spreadsheet.xlsx', 0)).to eq(expected_output)
+        expect(Excellent.parse('./spec/fixtures/test_spreadsheet.xlsx', 0)).to eq(expected_output)
       end
     end
   end
