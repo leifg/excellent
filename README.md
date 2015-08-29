@@ -16,6 +16,26 @@ Sample output:
 ]
 ```
 
+## Installation
+
+You can add Excellent as a dependency in your `mix.exs` file. Since it only requires Elixir and Erlang there are no other dependencies.
+
+```elixir
+def deps do
+  [ { :excellent, "~> 1.5.0" } ]
+end
+```
+
+If you aren't using hex, add the a reference to the github repo.
+
+``` elixir
+def deps do
+  [ { :excellent, github: "leifg/excellent" } ]
+end
+```
+
+Then run `mix deps.get` in the shell to fetch and compile the dependencies
+
 ## Usage
 
 The top level funtion takes 2 arguments: the filename and the number of the worksheet you want to parse (zero based).
