@@ -22,7 +22,7 @@ You can add Excellent as a dependency in your `mix.exs` file. Since it only requ
 
 ```elixir
 def deps do
-  [ { :excellent, "~> 1.5.0" } ]
+  [ { :excellent, "~> 0.0.1" } ]
 end
 ```
 
