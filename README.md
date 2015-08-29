@@ -38,6 +38,7 @@ There is also a function to return the names of the worksheets as a tuple:
 Excellent.worksheet_names('spreadsheet.xlsx')
 
 => {"Worksheet 1", "Worksheet 2"}
+```
 
 ## TODO
 
