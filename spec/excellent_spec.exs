@@ -17,11 +17,162 @@ defmodule ExcellentSpec do
         expect(Excellent.parse('./spec/fixtures/test_spreadsheet.xlsx', 0)).to eq(expected_output)
       end
     end
+
+    context "mixed types" do
+      let :expected_output do
+        [
+          ["2.A1", "2.B1", "2.C1", "2.D1"],
+          ["Text", 123, {{2011, 8, 24}, {10, 35, 17}}, true],
+          ["Text with Encodingßäôé", 123.456, {{2008, 2, 29}, {0, 0, 0}}, false],
+          ["Text with Number 123", 17.23, {{2106, 2, 10}, {23, 19, 17}}, true],
+          ["Text with Newline\n\n\nAnd so on", 53.19, {{1965, 11, 10}, {0, 0, 0}}, false],
+        ]
+      end
+
+      it "returns contents as stream" do
+        expect(Excellent.parse('./spec/fixtures/test_spreadsheet.xlsx', 1)).to eq(expected_output)
+      end
+    end
   end
 
   describe "#worksheet_names" do
     it "returns worksheet names" do
       expect(Excellent.worksheet_names('./spec/fixtures/test_spreadsheet.xlsx')).to eq({"Text Only", "Mixed Types"})
+    end
+  end
+
+  describe "#styles_to_tuple" do
+    let :styles do
+      """
+      <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+        <numFmts count="4">
+          <numFmt formatCode="GENERAL" numFmtId="164"/>
+          <numFmt formatCode="YYYY\-MM\-DD" numFmtId="165"/>
+          <numFmt formatCode="[$USD]0.00" numFmtId="166"/>
+          <numFmt formatCode="[$€-2]0.00" numFmtId="167"/>
+        </numFmts>
+        <fonts count="6">
+          <font>
+            <sz val="10"/>
+            <name val="Arial"/>
+            <family val="2"/>
+          </font>
+          <font>
+            <sz val="10"/>
+            <name val="Arial"/>
+            <family val="0"/>
+          </font>
+          <font>
+            <sz val="10"/>
+            <name val="Arial"/>
+            <family val="0"/>
+          </font>
+          <font>
+            <sz val="10"/>
+            <name val="Arial"/>
+            <family val="0"/>
+          </font>
+          <font>
+            <sz val="10"/>
+            <color rgb="FF000000"/>
+            <name val="Arial"/>
+            <family val="2"/>
+            <charset val="1"/>
+          </font>
+          <font>
+            <sz val="10"/>
+            <name val="Arial"/>
+            <family val="2"/>
+            <charset val="1"/>
+          </font>
+        </fonts>
+        <fills count="2">
+          <fill>
+            <patternFill patternType="none"/>
+          </fill>
+          <fill>
+            <patternFill patternType="gray125"/>
+          </fill>
+        </fills>
+        <borders count="1">
+          <border diagonalDown="false" diagonalUp="false">
+            <left/>
+            <right/>
+            <top/>
+            <bottom/>
+            <diagonal/>
+          </border>
+        </borders>
+        <cellStyleXfs count="20">
+          <xf applyAlignment="true" applyBorder="true" applyFont="true" applyProtection="true" borderId="0" fillId="0" fontId="0" numFmtId="164">
+            <alignment horizontal="general" indent="0" shrinkToFit="false" textRotation="0" vertical="bottom" wrapText="false"/>
+            <protection hidden="false" locked="true"/>
+          </xf>
+          <xf applyAlignment="false" applyBorder="false" applyFont="true" applyProtection="false" borderId="0" fillId="0" fontId="1" numFmtId="0"/>
+          <xf applyAlignment="false" applyBorder="false" applyFont="true" applyProtection="false" borderId="0" fillId="0" fontId="1" numFmtId="0"/>
+          <xf applyAlignment="false" applyBorder="false" applyFont="true" applyProtection="false" borderId="0" fillId="0" fontId="2" numFmtId="0"/>
+          <xf applyAlignment="false" applyBorder="false" applyFont="true" applyProtection="false" borderId="0" fillId="0" fontId="2" numFmtId="0"/>
+          <xf applyAlignment="false" applyBorder="false" applyFont="true" applyProtection="false" borderId="0" fillId="0" fontId="0" numFmtId="0"/>
+          <xf applyAlignment="false" applyBorder="false" applyFont="true" applyProtection="false" borderId="0" fillId="0" fontId="0" numFmtId="0"/>
+          <xf applyAlignment="false" applyBorder="false" applyFont="true" applyProtection="false" borderId="0" fillId="0" fontId="0" numFmtId="0"/>
+          <xf applyAlignment="false" applyBorder="false" applyFont="true" applyProtection="false" borderId="0" fillId="0" fontId="0" numFmtId="0"/>
+          <xf applyAlignment="false" applyBorder="false" applyFont="true" applyProtection="false" borderId="0" fillId="0" fontId="0" numFmtId="0"/>
+          <xf applyAlignment="false" applyBorder="false" applyFont="true" applyProtection="false" borderId="0" fillId="0" fontId="0" numFmtId="0"/>
+          <xf applyAlignment="false" applyBorder="false" applyFont="true" applyProtection="false" borderId="0" fillId="0" fontId="0" numFmtId="0"/>
+          <xf applyAlignment="false" applyBorder="false" applyFont="true" applyProtection="false" borderId="0" fillId="0" fontId="0" numFmtId="0"/>
+          <xf applyAlignment="false" applyBorder="false" applyFont="true" applyProtection="false" borderId="0" fillId="0" fontId="0" numFmtId="0"/>
+          <xf applyAlignment="false" applyBorder="false" applyFont="true" applyProtection="false" borderId="0" fillId="0" fontId="0" numFmtId="0"/>
+          <xf applyAlignment="false" applyBorder="false" applyFont="true" applyProtection="false" borderId="0" fillId="0" fontId="1" numFmtId="43"/>
+          <xf applyAlignment="false" applyBorder="false" applyFont="true" applyProtection="false" borderId="0" fillId="0" fontId="1" numFmtId="41"/>
+          <xf applyAlignment="false" applyBorder="false" applyFont="true" applyProtection="false" borderId="0" fillId="0" fontId="1" numFmtId="44"/>
+          <xf applyAlignment="false" applyBorder="false" applyFont="true" applyProtection="false" borderId="0" fillId="0" fontId="1" numFmtId="42"/>
+          <xf applyAlignment="false" applyBorder="false" applyFont="true" applyProtection="false" borderId="0" fillId="0" fontId="1" numFmtId="9"/>
+        </cellStyleXfs>
+        <cellXfs count="6">
+          <xf applyAlignment="false" applyBorder="false" applyFont="false" applyProtection="false" borderId="0" fillId="0" fontId="0" numFmtId="164" xfId="0">
+            <alignment horizontal="general" indent="0" shrinkToFit="false" textRotation="0" vertical="bottom" wrapText="false"/>
+            <protection hidden="false" locked="true"/>
+          </xf>
+          <xf applyAlignment="false" applyBorder="true" applyFont="true" applyProtection="false" borderId="0" fillId="0" fontId="4" numFmtId="164" xfId="0">
+            <alignment horizontal="general" indent="0" shrinkToFit="false" textRotation="0" vertical="bottom" wrapText="false"/>
+            <protection hidden="false" locked="true"/>
+          </xf>
+          <xf applyAlignment="true" applyBorder="true" applyFont="true" applyProtection="false" borderId="0" fillId="0" fontId="5" numFmtId="164" xfId="0">
+            <alignment horizontal="general" indent="0" shrinkToFit="false" textRotation="0" vertical="top" wrapText="true"/>
+            <protection hidden="false" locked="true"/>
+          </xf>
+          <xf applyAlignment="true" applyBorder="true" applyFont="true" applyProtection="false" borderId="0" fillId="0" fontId="5" numFmtId="165" xfId="0">
+            <alignment horizontal="general" indent="0" shrinkToFit="false" textRotation="0" vertical="top" wrapText="true"/>
+            <protection hidden="false" locked="true"/>
+          </xf>
+          <xf applyAlignment="true" applyBorder="true" applyFont="true" applyProtection="false" borderId="0" fillId="0" fontId="5" numFmtId="166" xfId="0">
+            <alignment horizontal="general" indent="0" shrinkToFit="false" textRotation="0" vertical="top" wrapText="true"/>
+            <protection hidden="false" locked="true"/>
+          </xf>
+          <xf applyAlignment="true" applyBorder="true" applyFont="true" applyProtection="false" borderId="0" fillId="0" fontId="5" numFmtId="167" xfId="0">
+            <alignment horizontal="general" indent="0" shrinkToFit="false" textRotation="0" vertical="top" wrapText="true"/>
+            <protection hidden="false" locked="true"/>
+          </xf>
+        </cellXfs>
+        <cellStyles count="6">
+          <cellStyle builtinId="0" customBuiltin="false" name="Normal" xfId="0"/>
+          <cellStyle builtinId="3" customBuiltin="false" name="Comma" xfId="15"/>
+          <cellStyle builtinId="6" customBuiltin="false" name="Comma [0]" xfId="16"/>
+          <cellStyle builtinId="4" customBuiltin="false" name="Currency" xfId="17"/>
+          <cellStyle builtinId="7" customBuiltin="false" name="Currency [0]" xfId="18"/>
+          <cellStyle builtinId="5" customBuiltin="false" name="Percent" xfId="19"/>
+        </cellStyles>
+      </styleSheet>
+      """
+    end
+
+    let :expected_tuple do
+      { "GENERAL", "GENERAL", "GENERAL", "YYYY\-MM\-DD", "[$USD]0.00", "[$€-2]0.00"}
+    end
+
+    it "returns expected tuple" do
+      expect(Excellent.styles_to_tuple(styles)).to eq(expected_tuple)
     end
   end
 
@@ -112,10 +263,7 @@ defmodule ExcellentSpec do
           <t>Text with Number 123</t>
         </si>
         <si>
-          <t>Text with Newline
-
-
-      And so on</t>
+          <t>Text with Newline&#10;&#10;&#10;And so on</t>
         </si>
       </sst>
       """
