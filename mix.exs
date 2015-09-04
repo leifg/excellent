@@ -7,6 +7,7 @@ defmodule Excellent.Mixfile do
      elixir: "~> 1.0",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
+     test_coverage: [tool: Coverex.Task, coveralls: true],
      description: description,
      package: package,
      deps: deps]
@@ -22,6 +23,7 @@ defmodule Excellent.Mixfile do
   defp deps do
     [
       { :espec, "~> 0.7.0", only: :test },
+      { :coverex, "~> 1.4.1", only: :test },
     ]
   end
 
