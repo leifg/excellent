@@ -9,12 +9,12 @@ defmodule Excellent do
       |> Excellent.Parser.parse_worksheet_names
   end
 
-  def shared_strings(spreadsheet_filename) do
+  defp shared_strings(spreadsheet_filename) do
     file_content(spreadsheet_filename, 'xl/sharedStrings.xml')
       |> Excellent.Parser.parse_shared_strings
   end
 
-  def styles(spreadsheet_filename) do
+  defp styles(spreadsheet_filename) do
     file_content(spreadsheet_filename, 'xl/styles.xml')
       |> Excellent.Parser.parse_styles
   end
