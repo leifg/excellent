@@ -1,4 +1,8 @@
-# Excellent
+# Excellent 
+
+[![Build Status](https://travis-ci.org/leifg/excellent.svg?branch=master)]
+[![Coverage Status](https://coveralls.io/repos/leifg/excellent/badge.png?branch=master)]
+[![hex.pm version](https://img.shields.io/hexpm/v/excellent.svg?style=flat)]
 
 **DISCLAIMER:** Under heavy development.
 
