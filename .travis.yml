@@ -7,4 +7,4 @@ env: MIX_ENV=test
 before_script:
   - mix deps.get --only test
 script:
-  - mix espec
+  - mix espec --cover
