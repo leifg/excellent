@@ -17,13 +17,14 @@ defmodule Excellent.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [applications: [:logger]]
+    [applications: [:exfswatch, :logger]]
   end
 
   defp deps do
     [
       { :espec, "~> 0.8.1", only: :test },
       { :coverex, "~> 1.4.3", only: :test },
+      { :exfswatch, "~> 0.1.0", only: :test },
     ]
   end
 
