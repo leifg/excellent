@@ -52,17 +52,6 @@ defmodule Excellent.Parser do
       |> List.to_tuple
   end
 
-  defp event({:startElement, _, 'row', _, _}, _, state) do
-    Dict.put(state, :current_row, [])
-  end
-
-  defp event({:startElement, _, 'c', _, [_, {_, _, @shared_string_type, style}, {_, _, 't', type}]}, _, state) do
-    { style_int, _ } = Integer.parse(to_string(style))
-    style_content = elem(state.styles, style_int)
-    type = calculate_type(style_content, type)
-    Dict.put(state, :type, type)
-  end
-
   defp extract_attribute(node, attr_name) do
     [ret | _] = :xmerl_xpath.string('./@#{attr_name}', node)
     xmlAttribute(ret, :value) |> to_string
@@ -84,6 +73,17 @@ defmodule Excellent.Parser do
           "string"
       end
     end
+  end
+
+  defp event({:startElement, _, 'row', _, _}, _, state) do
+    Dict.put(state, :current_row, [])
+  end
+
+  defp event({:startElement, _, 'c', _, [_, {_, _, @shared_string_type, style}, {_, _, 't', type}]}, _, state) do
+    { style_int, _ } = Integer.parse(to_string(style))
+    style_content = elem(state.styles, style_int)
+    type = calculate_type(style_content, type)
+    Dict.put(state, :type, type)
   end
 
   defp event({:startElement, _, 'c', _, [_, _, {_, _, 't', 's'}]}, _, state) do
