@@ -8,6 +8,8 @@ defmodule Excellent.Parser do
   @seconds_in_day 24 * 60 * 60
   @base_date :calendar.datetime_to_gregorian_seconds({{1899, 12, 30}, {0,0,0}})
 
+  @shared_string_type 's'
+
   def sax_parse_worksheet(xml_content, shared_strings, styles) do
     {:ok, res, _} = :xmerl_sax_parser.stream(
       xml_content,
@@ -18,7 +20,7 @@ defmodule Excellent.Parser do
         content: []
       }
     )
-    res[:content]
+    Enum.reverse(res[:content])
   end
 
   def parse_worksheet_names(xml_content) do
@@ -52,7 +54,7 @@ defmodule Excellent.Parser do
     Dict.put(state, :current_row, [])
   end
 
-  defp event({:startElement, _, 'c', _, [_, {_, _, 's', style}, {_, _, 't', type}]}, _, state) do
+  defp event({:startElement, _, 'c', _, [_, {_, _, @shared_string_type, style}, {_, _, 't', type}]}, _, state) do
     { style_int, _ } = Integer.parse(to_string(style))
     style_content = elem(state.styles, style_int)
     type = calculate_type(style_content, to_string(type))
@@ -106,7 +108,10 @@ defmodule Excellent.Parser do
     {line, _} = chars |> :erlang.list_to_binary |> Integer.parse
     line = elem(state[:shared_strings], line)
 
-    Dict.put(state, :current_row, List.insert_at(state[:current_row],-1, line))
+    %{
+      state |
+      current_row: [line|state[:current_row]]
+    }
   end
 
   defp event({:characters, chars}, _, %{ collect: true, type: "number" } = state) do
@@ -117,7 +122,11 @@ defmodule Excellent.Parser do
         {float, _} = Float.parse("#{float_number}#{float_decimals}")
         float
       end
-    Dict.put(state, :current_row, List.insert_at(state[:current_row],-1, value))
+
+    %{
+      state |
+      current_row: [value|state[:current_row]]
+    }
   end
 
   defp event({:characters, chars}, _, %{ collect: true, type: "boolean" } = state) do
@@ -126,7 +135,11 @@ defmodule Excellent.Parser do
     else
       false
     end
-    Dict.put(state, :current_row, List.insert_at(state[:current_row],-1, value))
+
+    %{
+      state |
+      current_row: [value|state[:current_row]]
+    }
   end
 
   defp event({:characters, chars}, _, %{ collect: true, type: "date" } = state) do
@@ -134,11 +147,17 @@ defmodule Excellent.Parser do
 
     datetime = @base_date + ajd * @seconds_in_day |> round |> :calendar.gregorian_seconds_to_datetime
 
-    Dict.put(state, :current_row, List.insert_at(state[:current_row],-1, datetime))
+    %{
+      state |
+      current_row: [datetime|state[:current_row]]
+    }
   end
 
   defp event({:endElement, _, 'row', _}, _, state) do
-    Dict.put(state, :content, List.insert_at(state[:content],-1, state[:current_row]))
+    %{
+      state |
+      content: [Enum.reverse(state[:current_row])|state[:content]]
+    }
   end
 
   defp event(_, _, state) do
