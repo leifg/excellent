@@ -6,49 +6,51 @@ defmodule Monitor do
   end
 
   def callback(file_path, events) do
-    filter(file_path) |> eval_spec |> run_spec
-  end
-
-  defp eval_spec({:ok, file_path}) do
-    if Regex.match?(~r/_spec\.exs$/, file_path) do
-      {:ok, file_path}
-    else
-      find_spec(file_path)
+    if Enum.member?(events, :modified) do
+      {:ok, file_path} |> filter |> find_spec |> run_spec
     end
   end
 
-  defp eval_spec(state) do
-    state
-  end
-
-  defp filter(file_path) do
+  defp filter({:ok, file_path}) do
     if Regex.match?( ~r/\.(ex|exs|eex)\z/i, file_path ) do
       {:ok, file_path}
     else
-      {:error, {:eexist, file_path}}
+      {:ignore, {:no_elixir_file, file_path}}
     end
   end
 
-  defp find_spec(file_path) do
-    file_name = Regex.replace(~r/\.exs?$/, file_path, "_spec.exs")
-    modified_file_path = Regex.replace(~r/\/lib\//, file_name, "/spec/")
-    if File.exists?(modified_file_path) do
-      {:ok, modified_file_path}
-    else
-      {:error, {:enoent, file_path}}
+  defp filter(state) do
+    state
+  end
+
+  defp find_spec({:ok, file_path}) do
+    cond do
+      Regex.match?(~r/_spec\.exs$/, file_path) ->
+        {:ok, file_path}
+      File.exists?(guess_spec_path(file_path)) ->
+        {:ok, guess_spec_path(file_path)}
+      true ->
+        {:ignore, { :no_spec_file_found, file_path } }
     end
+  end
+
+  defp find_spec(state) do
+    state
   end
 
   defp run_spec({:ok, file_path}) do
     IO.puts "Running specs for '#{file_path}'"
     Mix.Task.reenable "espec"
     Mix.Task.run "espec", [file_path]
+    {:ok, file_path}
   end
 
-  defp run_spec({:error, {:enoent, file_path}}) do
-    IO.puts "no spec file found for '#{file_path}'"
+  defp run_spec(state) do
+    state
   end
 
-  defp run_spec({:error, {:eexist, _file_path}}) do
-  end #nothig
+  defp guess_spec_path(file_path) do
+    file_name = Regex.replace(~r/\.exs?$/, file_path, "_spec.exs")
+    Regex.replace(~r/\/lib\//, file_name, "/spec/")
+  end
 end
