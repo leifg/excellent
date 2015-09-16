@@ -9,6 +9,8 @@ defmodule Excellent.Parser do
   @base_date :calendar.datetime_to_gregorian_seconds({{1899, 12, 30}, {0,0,0}})
 
   @shared_string_type 's'
+  @number_type 'n'
+  @boolean_type 'b'
 
   @true_value '1'
   @false_value '0'
@@ -60,7 +62,7 @@ defmodule Excellent.Parser do
   defp event({:startElement, _, 'c', _, [_, {_, _, @shared_string_type, style}, {_, _, 't', type}]}, _, state) do
     { style_int, _ } = Integer.parse(to_string(style))
     style_content = elem(state.styles, style_int)
-    type = calculate_type(style_content, to_string(type))
+    type = calculate_type(style_content, type)
     Dict.put(state, :type, type)
   end
 
@@ -75,11 +77,11 @@ defmodule Excellent.Parser do
       "date"
     else
       case {type, style} do
-        {"s", _} ->
+        {@shared_string_type, _} ->
           "shared_string"
-        {"n", _} ->
+        {@number_type, _} ->
           "number"
-        {"b", _} ->
+        {@boolean_type, _} ->
           "boolean"
         _ ->
           "string"
