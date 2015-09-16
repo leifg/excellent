@@ -5,8 +5,12 @@ defmodule Excellent.Parser do
   Record.defrecord :xmlAttribute, Record.extract(:xmlAttribute, from_lib: "xmerl/include/xmerl.hrl")
   Record.defrecord :xmlText, Record.extract(:xmlText, from_lib: "xmerl/include/xmerl.hrl")
 
-  @seconds_in_day 24 * 60 * 60
-  @base_date :calendar.datetime_to_gregorian_seconds({{1899, 12, 30}, {0,0,0}})
+  @shared_string_type 's'
+  @number_type 'n'
+  @boolean_type 'b'
+
+  @true_value '1'
+  @false_value '0'
 
   def sax_parse_worksheet(xml_content, shared_strings, styles) do
     {:ok, res, _} = :xmerl_sax_parser.stream(
@@ -18,7 +22,7 @@ defmodule Excellent.Parser do
         content: []
       }
     )
-    res[:content]
+    Enum.reverse(res[:content])
   end
 
   def parse_worksheet_names(xml_content) do
@@ -48,17 +52,6 @@ defmodule Excellent.Parser do
       |> List.to_tuple
   end
 
-  defp event({:startElement, _, 'row', _, _}, _, state) do
-    Dict.put(state, :current_row, [])
-  end
-
-  defp event({:startElement, _, 'c', _, [_, {_, _, 's', style}, {_, _, 't', type}]}, _, state) do
-    { style_int, _ } = Integer.parse(to_string(style))
-    style_content = elem(state.styles, style_int)
-    type = calculate_type(style_content, to_string(type))
-    Dict.put(state, :type, type)
-  end
-
   defp extract_attribute(node, attr_name) do
     [ret | _] = :xmerl_xpath.string('./@#{attr_name}', node)
     xmlAttribute(ret, :value) |> to_string
@@ -70,16 +63,27 @@ defmodule Excellent.Parser do
       "date"
     else
       case {type, style} do
-        {"s", _} ->
+        {@shared_string_type, _} ->
           "shared_string"
-        {"n", _} ->
+        {@number_type, _} ->
           "number"
-        {"b", _} ->
+        {@boolean_type, _} ->
           "boolean"
         _ ->
           "string"
       end
     end
+  end
+
+  defp event({:startElement, _, 'row', _, _}, _, state) do
+    Dict.put(state, :current_row, [])
+  end
+
+  defp event({:startElement, _, 'c', _, [_, {_, _, @shared_string_type, style}, {_, _, 't', type}]}, _, state) do
+    { style_int, _ } = Integer.parse(to_string(style))
+    style_content = elem(state.styles, style_int)
+    type = calculate_type(style_content, type)
+    Dict.put(state, :type, type)
   end
 
   defp event({:startElement, _, 'c', _, [_, _, {_, _, 't', 's'}]}, _, state) do
@@ -102,43 +106,20 @@ defmodule Excellent.Parser do
     Dict.put(state, :collect, false)
   end
 
-  defp event({:characters, chars}, _, %{ collect: true, type: "shared_string" } = state) do
-    {line, _} = chars |> :erlang.list_to_binary |> Integer.parse
-    line = elem(state[:shared_strings], line)
+  defp event({:characters, chars}, _, %{ collect: true, type: type } = state) do
+    value = to_string(chars) |> Type.from_string(%{type: type, lookup: state[:shared_strings]})
 
-    Dict.put(state, :current_row, List.insert_at(state[:current_row],-1, line))
-  end
-
-  defp event({:characters, chars}, _, %{ collect: true, type: "number" } = state) do
-    value = case chars |> :erlang.list_to_binary |> Integer.parse do
-      { int, "" } ->
-        int
-      { float_number, float_decimals } ->
-        {float, _} = Float.parse("#{float_number}#{float_decimals}")
-        float
-      end
-    Dict.put(state, :current_row, List.insert_at(state[:current_row],-1, value))
-  end
-
-  defp event({:characters, chars}, _, %{ collect: true, type: "boolean" } = state) do
-    value = if :erlang.list_to_binary(chars) == "1" do
-      true
-    else
-      false
-    end
-    Dict.put(state, :current_row, List.insert_at(state[:current_row],-1, value))
-  end
-
-  defp event({:characters, chars}, _, %{ collect: true, type: "date" } = state) do
-    { ajd, _ } = :erlang.list_to_binary(chars) |> Float.parse
-
-    datetime = @base_date + ajd * @seconds_in_day |> round |> :calendar.gregorian_seconds_to_datetime
-
-    Dict.put(state, :current_row, List.insert_at(state[:current_row],-1, datetime))
+    %{
+      state |
+      current_row: [value|state[:current_row]]
+    }
   end
 
   defp event({:endElement, _, 'row', _}, _, state) do
-    Dict.put(state, :content, List.insert_at(state[:content],-1, state[:current_row]))
+    %{
+      state |
+      content: [Enum.reverse(state[:current_row])|state[:content]]
+    }
   end
 
   defp event(_, _, state) do
