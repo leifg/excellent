@@ -109,46 +109,12 @@ defmodule Excellent.Parser do
     Dict.put(state, :collect, false)
   end
 
-  defp event({:characters, chars}, _, %{ collect: true, type: "shared_string" } = state) do
-    {line, _} = chars |> :erlang.list_to_binary |> Integer.parse
-    line = elem(state[:shared_strings], line)
-
-    %{
-      state |
-      current_row: [line|state[:current_row]]
-    }
-  end
-
-  defp event({:characters, chars}, _, %{ collect: true, type: "number" } = state) do
-    value = case chars |> :erlang.list_to_binary |> Integer.parse do
-      { int, "" } ->
-        int
-      { float_number, float_decimals } ->
-        {float, _} = Float.parse("#{float_number}#{float_decimals}")
-        float
-      end
+  defp event({:characters, chars}, _, %{ collect: true, type: type } = state) do
+    value = to_string(chars) |> Type.from_string(%{type: type, lookup: state[:shared_strings]})
 
     %{
       state |
       current_row: [value|state[:current_row]]
-    }
-  end
-
-  defp event({:characters, chars}, _, %{ collect: true, type: "boolean" } = state) do
-    %{
-      state |
-      current_row: [chars == @true_value|state[:current_row]]
-    }
-  end
-
-  defp event({:characters, chars}, _, %{ collect: true, type: "date" } = state) do
-    { ajd, _ } = :erlang.list_to_binary(chars) |> Float.parse
-
-    datetime = @base_date + ajd * @seconds_in_day |> round |> :calendar.gregorian_seconds_to_datetime
-
-    %{
-      state |
-      current_row: [datetime|state[:current_row]]
     }
   end
 
