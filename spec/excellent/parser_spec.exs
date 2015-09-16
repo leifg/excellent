@@ -1,7 +1,6 @@
 defmodule ParserSpec do
   use ESpec
 
-
   describe "#parse_shared_strings" do
     let :shared_strings do
       """
