@@ -10,6 +10,9 @@ defmodule Excellent.Parser do
 
   @shared_string_type 's'
 
+  @true_value '1'
+  @false_value '0'
+
   def sax_parse_worksheet(xml_content, shared_strings, styles) do
     {:ok, res, _} = :xmerl_sax_parser.stream(
       xml_content,
@@ -130,15 +133,9 @@ defmodule Excellent.Parser do
   end
 
   defp event({:characters, chars}, _, %{ collect: true, type: "boolean" } = state) do
-    value = if :erlang.list_to_binary(chars) == "1" do
-      true
-    else
-      false
-    end
-
     %{
       state |
-      current_row: [value|state[:current_row]]
+      current_row: [chars == @true_value|state[:current_row]]
     }
   end
 
