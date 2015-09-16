@@ -27,12 +27,11 @@ defmodule Type do
     from_string(to_float, %{type: "date"})
   end
 
-  def from_string(input, %{type: "shared_string", lookup: lookup}) when is_integer(input) do
+  def from_string(input, %{type: "shared_string", lookup: lookup}) when is_number(input) do
     elem(lookup, input)
   end
 
-  def from_string(input, %{type: "shared_string", lookup: lookup}) when is_bitstring(input) do
-    {to_int, _} = Integer.parse(input)
-    from_string(to_int, %{type: "shared_string", lookup: lookup})
+  def from_string(input, options) when is_bitstring(input) do
+    from_string(input, %{type: "number"}) |> from_string(options)
   end
 end

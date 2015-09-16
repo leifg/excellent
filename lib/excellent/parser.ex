@@ -5,9 +5,6 @@ defmodule Excellent.Parser do
   Record.defrecord :xmlAttribute, Record.extract(:xmlAttribute, from_lib: "xmerl/include/xmerl.hrl")
   Record.defrecord :xmlText, Record.extract(:xmlText, from_lib: "xmerl/include/xmerl.hrl")
 
-  @seconds_in_day 24 * 60 * 60
-  @base_date :calendar.datetime_to_gregorian_seconds({{1899, 12, 30}, {0,0,0}})
-
   @shared_string_type 's'
   @number_type 'n'
   @boolean_type 'b'
