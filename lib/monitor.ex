@@ -41,6 +41,7 @@ defmodule Monitor do
   defp run_spec({:ok, file_path}) do
     IO.puts "Running specs for '#{file_path}'"
     Mix.Task.reenable "espec"
+    ESpec.start
     Mix.Task.run "espec", [file_path]
     {:ok, file_path}
   end
