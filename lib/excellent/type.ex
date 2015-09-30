@@ -1,4 +1,4 @@
-defmodule Type do
+defmodule Excellent.Type do
   @true_value "1"
 
   @seconds_in_day 24 * 60 * 60

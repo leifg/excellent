@@ -107,7 +107,7 @@ defmodule Excellent.Parser do
   end
 
   defp event({:characters, chars}, _, %{ collect: true, type: type } = state) do
-    value = to_string(chars) |> Type.from_string(%{type: type, lookup: state[:shared_strings]})
+    value = to_string(chars) |> Excellent.Type.from_string(%{type: type, lookup: state[:shared_strings]})
 
     %{
       state |

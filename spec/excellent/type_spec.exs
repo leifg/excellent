@@ -8,7 +8,7 @@ defmodule TypeSpec do
       let :expected_output, do: "a string"
 
       it "returns the same string" do
-        expect(Type.from_string(input, %{type: type})).to eq(expected_output)
+        expect(Excellent.Type.from_string(input, %{type: type})).to eq(expected_output)
       end
     end
 
@@ -20,16 +20,16 @@ defmodule TypeSpec do
         let :expected_output, do: true
 
         it "returns true" do
-          expect(Type.from_string(input, %{type: type})).to eq(expected_output)
+          expect(Excellent.Type.from_string(input, %{type: type})).to eq(expected_output)
         end
       end
 
-      context "true" do
+      context "false" do
         let :input, do: "0"
         let :expected_output, do: false
 
         it "returns false" do
-          expect(Type.from_string(input, %{type: type})).to eq(expected_output)
+          expect(Excellent.Type.from_string(input, %{type: type})).to eq(expected_output)
         end
       end
     end
@@ -42,7 +42,7 @@ defmodule TypeSpec do
         let :input, do: "1"
 
         it "returns the expected output" do
-          expect(Type.from_string(input, %{type: type})).to eq(expected_output)
+          expect(Excellent.Type.from_string(input, %{type: type})).to eq(expected_output)
         end
       end
 
@@ -51,7 +51,7 @@ defmodule TypeSpec do
         let :expected_output, do: 123.456
 
         it "returns the expected output" do
-          expect(Type.from_string(input, %{type: type})).to eq(expected_output)
+          expect(Excellent.Type.from_string(input, %{type: type})).to eq(expected_output)
         end
       end
     end
@@ -64,7 +64,7 @@ defmodule TypeSpec do
         let :input, do: 40779.4411689815
 
         it "returns the expected output" do
-          expect(Type.from_string(input, %{type: type})).to eq(expected_output)
+          expect(Excellent.Type.from_string(input, %{type: type})).to eq(expected_output)
         end
       end
 
@@ -72,7 +72,7 @@ defmodule TypeSpec do
         let :input, do: "40779.4411689815"
 
         it "returns the expected output" do
-          expect(Type.from_string(input, %{type: type})).to eq(expected_output)
+          expect(Excellent.Type.from_string(input, %{type: type})).to eq(expected_output)
         end
       end
     end
@@ -86,7 +86,7 @@ defmodule TypeSpec do
         let :input, do: 2
 
         it "returns the expected output" do
-          expect(Type.from_string(input, %{type: type, lookup: lookup})).to eq(expected_output)
+          expect(Excellent.Type.from_string(input, %{type: type, lookup: lookup})).to eq(expected_output)
         end
       end
 
@@ -94,7 +94,7 @@ defmodule TypeSpec do
         let :input, do: "2"
 
         it "returns the expected output" do
-          expect(Type.from_string(input, %{type: type, lookup: lookup})).to eq(expected_output)
+          expect(Excellent.Type.from_string(input, %{type: type, lookup: lookup})).to eq(expected_output)
         end
       end
     end
