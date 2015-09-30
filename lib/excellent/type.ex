@@ -19,7 +19,7 @@ defmodule Type do
   end
 
   def from_string(input, %{type: "date"}) when is_float(input) do
-    datetime = @base_date + input * @seconds_in_day |> round |> :calendar.gregorian_seconds_to_datetime
+    @base_date + input * @seconds_in_day |> round |> :calendar.gregorian_seconds_to_datetime
   end
 
   def from_string(input, %{type: "date"}) when is_bitstring(input) do
