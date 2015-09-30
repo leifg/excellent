@@ -22,8 +22,8 @@ defmodule Excellent.Mixfile do
 
   defp deps do
     [
-      { :espec, "~> 0.7.0", only: :test },
-      { :coverex, "~> 1.4.1", only: :test },
+      { :espec, "~> 0.8.1", only: :test },
+      { :coverex, "~> 1.4.3", only: :test },
     ]
   end
 
