@@ -6,7 +6,7 @@
 
 
 **DISCLAIMER:** Completely abandoned, not further development will take place.
-If you're looking for an xlxs parsing library, consider using [xlsxir] (https://github.com/jsonkenl/xlsxir)
+If you're looking for an xlxs parsing library, consider using [xlsxir](https://github.com/jsonkenl/xlsxir)
 
 This is a library for parsing `.xlsx` files (Open XML format). It is targeted for reading Excel 2000 files into a list of lists.
 
